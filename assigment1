@@ -1,0 +1,142 @@
+1.	Write a C program to find the sum, difference, product, and division of two numbers
+#include <stdio.h>
+int main() {
+    float num1, num2;
+    float sum, diff, prod, div;
+    printf("Enter two numbers: ");
+    scanf("%f %f", &num1, &num2);
+    sum  = num1 + num2;
+    diff = num1 - num2;
+    prod = num1 * num2;
+    printf("\nResults:\n");
+    printf("Sum: %.2f\n", sum);
+    printf("Difference: %.2f\n", diff);
+    printf("Product: %.2f\n", prod);
+    if (num2 != 0) {
+        div = num1 / num2;
+        printf("Division: %.2f\n", div);
+    } else {
+        printf("Division: Error! Division by zero is not allowed.\n");
+    }
+     return 0;
+}
+
+2.	Write a C program to swap two numbers using a temporary variable.
+#include <stdio.h>
+int main() {
+    int a, b, temp;
+    printf("Enter first number: ");
+    scanf("%d", &a);
+    printf("Enter second number: ");
+    scanf("%d", &b);
+    printf("\nBefore swapping: a = %d, b = %d\n", a, b);
+    temp = a;    // 1. Move 'a' into the temp container
+    a = b;       // 2. Move 'b' into 'a' (now that 'a' is safe in temp)
+    b = temp;    // 3. Move the value from temp into 'b'
+    printf("After swapping:  a = %d, b = %d\n", a, b);
+    return 0;
+}
+
+3.	Write a C program to swap two numbers without using a temporary variable.
+#include <stdio.h>
+int main() {
+    int a, b;
+    printf("Enter two integers: ");
+    scanf("%d %d", &a, &b);
+    printf("\nBefore swapping: a = %d, b = %d\n", a, b);
+    a = a + b; // a now holds the sum of both
+    b = a - b; // b becomes (original a + original b) - original b = original a
+    a = a - b; // a becomes (original a + original b) - original a = original b
+    printf("After swapping:  a = %d, b = %d\n", a, b);
+    return 0;
+}
+
+4.	Write a C program to calculate the average of three numbers.
+#include <stdio.h>
+int main() {
+    float num1, num2, num3, average;
+    printf("Enter three numbers: ");
+    scanf("%f %f %f", &num1, &num2, &num3);
+    average = (num1 + num2 + num3) / 3;
+    printf("The average of %.2f, %.2f, and %.2f is: %.2f\n", num1, num2, num3, average);
+    return 0;
+}
+
+5.	Write a C program to convert kilometers into meters and centimeters.
+#include <stdio.h>
+int main() {
+    float km, meters, cm;
+    printf("Enter distance in kilometers: ");
+    scanf("%f", &km);
+    meters = km * 1000;
+    cm = km * 100000;
+    printf("\n%.2f Kilometers is equal to:\n", km);
+    printf("%.2f Meters\n", meters);
+    printf("%.2f Centimeters\n", cm);
+    return 0;
+}
+
+6.	Write a C program to calculate the total and average marks of three subjects.
+#include <stdio.h>
+int main() {
+    float sub1, sub2, sub3;
+    float total, average;
+    printf("Enter marks for subject 1: ");
+    scanf("%f", &sub1);
+    printf("Enter marks for subject 2: ");
+    scanf("%f", &sub2);
+    printf("Enter marks for subject 3: ");
+    scanf("%f", &sub3);
+    total = sub1 + sub2 + sub3;
+    average = total / 3.0;
+    printf("\nTotal Marks: %.2f\n", total);
+    printf("Average Marks: %.2f\n", average);
+    return 0;
+}
+
+7.	Write a C program to demonstrate the use of constant values (const) in C.
+#include <stdio.h>
+int main() {
+    const float PI = 3.14159;
+    const int DAYS_IN_WEEK = 7;
+    float radius = 5.0;
+    float area = PI * radius * radius;
+    printf("--- Constant Demonstration ---\n");
+    printf("The value of PI is: %.5f\n", PI);
+    printf("Days in a week: %d\n", DAYS_IN_WEEK);
+    printf("Area of a circle with radius %.1f is: %.2f\n\n", radius, area);
+    printf("Note: If you try to reassign a 'const' variable, \n");
+    printf("the compiler will throw an error.\n");
+    return 0;
+}
+
+8.	Write a C program to find the square and cube of a number.
+#include <stdio.h>
+int main() {
+    float num, square, cube;
+    printf("Enter a number: ");
+    scanf("%f", &num);
+    square = num * num;
+    cube = num * num * num;
+    printf("Square of %.2f is: %.2f\n", num, square);
+    printf("Cube of %.2f is: %.2f\n", num, cube);
+    return 0;
+}
+
+9.	Write a C program to convert seconds into hours, minutes, and seconds.
+#include <stdio.h>
+int main() {
+    int total_seconds, hours, minutes, seconds;
+    printf("Enter total seconds: ");
+    scanf("%d", &total_seconds);
+    hours = total_seconds / 3600;
+    minutes = (total_seconds % 3600) / 60;
+    printf("%d seconds is equivalent to: %d hours, %d minutes, and %d seconds\n", 
+            total_seconds, hours, minutes, seconds);
+    return 0;
+}
+
+
+
+
+
