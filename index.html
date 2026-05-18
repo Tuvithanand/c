@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GramHealth | Rural Care & Reminders</title>
+    <!-- Tailwind CSS for vibrant, accessible UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🌱</span>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">GramHealth</h1>
+                    <p class="text-xs text-emerald-100 font-medium">Your Village Digital Health Assistant</p>
+                </div>
+            </div>
+            <div id="activePatientDisplay" class="hidden text-sm bg-emerald-800/40 px-4 py-1.5 rounded-full border border-emerald-500/30">
+                👤 <span id="displayPatientName" class="font-semibold"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINERS -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
+        
+        <!-- STEP 1: PATIENT PROFILE ENTRY -->
+        <section id="profileSection" class="max-w-xl mx-auto mt-8 bg-white border border-slate-200 shadow-xl rounded-2xl p-6 md:p-8">
+            <div class="text-center mb-6">
+                <span class="text-4xl">👋</span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-2">Namaste! Welcome</h2>
+                <p class="text-slate-500 mt-1">Please type your details below to begin your personalized health care plan.</p>
+            </div>
+            <form onsubmit="saveProfile(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Patient's Full Name</label>
+                    <input type="text" id="pName" required placeholder="Enter full name" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition text-base">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Doctor's Phone Number (For Emergencies)</label>
+                    <input type="tel" id="docPhone" required placeholder="e.g., 9876543210" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition text-base">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-emerald-200 transition text-base">
+                    Open My Health Portal ➔
+                </button>
+            </form>
+        </section>
+
+        <!-- MAIN DASHBOARD HUB (Hidden at start) -->
+        <div id="dashboardHub" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            
+            <!-- LEFT & CENTER PANELS: MEDICAL SELECTORS & RX OVERVIEW -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- EMERGENCY DOCTOR SPEED DIAL -->
+                <div class="bg-gradient-to-r from-rose-500 to-red-600 rounded-2xl p-4 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 text-center sm:text-left">
+                        <span class="text-3xl animate-pulse">🚨</span>
+                        <div>
+                            <h3 class="font-bold text-lg">Feeling Very Sick? Urgent Emergency?</h3>
+                            <p class="text-xs text-rose-100">Click the button to immediately connect with your registered doctor.</p>
+                        </div>
+                    </div>
+                    <a id="emergencyCallBtn" href="#" class="w-full sm:w-auto text-center bg-white hover:bg-rose-50 text-rose-600 font-bold px-6 py-2.5 rounded-xl shadow transition">
+                        📞 Call Doctor Now
+                    </a>
+                </div>
+
+                <!-- MEDICAL CONDITION CHOICE GRID -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">What health problem are you facing today?</h3>
+                    <p class="text-xs text-slate-400 mb-4">Select your condition. The system will automatically prepare standard medical logic and safe diets.</p>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="conditionGrid">
+                        <!-- Clickable options generated programmatically -->
+                    </div>
+                </div>
+
+                <!-- TREATMENT PROTOCOL DISPLAY -->
+                <div id="protocolDisplayCard" class="hidden bg-emerald-50/70 border border-emerald-200 rounded-2xl p-6 shadow-inner">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wide text-emerald-800 bg-emerald-200/60 px-2.5 py-1 rounded-md" id="selectedCondName">Condition</span>
+                            <h4 class="text-xl font-bold text-slate-900 mt-2">Standard Medical Management Plan</h4>
+                        </div>
+                        <span class="text-3xl" id="selectedCondIcon">🏥</span>
+                    </div>
+                    
+                    <div class="mt-4 border-t border-emerald-200/60 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h5 class="text-sm font-bold text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-1">💊 Primary Safe Treatment:</h5>
+                            <p class="text-base font-semibold text-emerald-900 bg-white p-3 rounded-xl border border-emerald-100" id="automaticMedicineText">Loading standard dosage guidelines...</p>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-bold text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-1">🍎 Mandatory Recovery Diet:</h5>
+                            <p class="text-sm text-slate-600 bg-white p-3 rounded-xl border border-emerald-100 leading-relaxed" id="automaticDietText">Dietary parameters...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DOCTOR'S ADDITIONAL PRESCRIPTION MANAGEMENT -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-1">📋 Did your Doctor give you extra medicines?</h3>
+                    <p class="text-xs text-slate-400 mb-4">Add them below so Elena can track them and adapt your daily diet rules.</p>
+                    
+                    <form onsubmit="addExtraMedicine(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Medicine Name</label>
+                            <input type="text" id="extraMedName" required placeholder="e.g., Amoxicillin" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">When to take?</label>
+                            <select id="extraMedTime" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm bg-white outline-none">
+                                <option value="Morning (Before Food)">🌅 Morning (Before Food)</option>
+                                <option value="Morning (After Food)">🌅 Morning (After Food)</option>
+                                <option value="Afternoon (After Food)">☀️ Afternoon (After Food)</option>
+                                <option value="Night (Before Sleep)">🌙 Night (Before Sleep)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-sm transition h-[38px]">
+                            ➕ Add To My Plan
+                        </button>
+                    </form>
+
+                    <!-- Extra Medicines Display Bucket -->
+                    <div id="extraMedsContainer" class="mt-4 space-y-2 hidden">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wide">Your Extra Prescribed Trackers:</h4>
+                        <div id="extraMedsList" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL: EMOTIONAL SUPPORT FEMALE AI COUNSELOR (ELENA) -->
+            <div class="lg:col-span-1">
+                <div class="bg-white border border-slate-200 rounded-2xl shadow-md overflow-hidden sticky top-24 flex flex-col h-[calc(100vh-8rem)] min-h-[520px]">
+                    
+                    <!-- Companion Header -->
+                    <div class="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-slate-100 flex items-center gap-3">
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-2xl shadow-inner">
+                                👩‍⚕️
+                            </div>
+                            <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full animate-pulse"></span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-base">Elena</h4>
+                            <p class="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                                <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Emotional & Diet Guide
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Chat Log Display -->
+                    <div id="chatLog" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm bg-slate-50/50">
+                        <!-- Prompts inject here -->
+                    </div>
+
+                    <!-- Input Box -->
+                    <div class="p-3 bg-white border-t border-slate-100">
+                        <form onsubmit="handleChat(event)" class="flex gap-2">
+                            <input type="text" id="chatInput" autocomplete="off" placeholder="Ask Elena about diet, pain, or anxiety..." class="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm outline-none transition">
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 rounded-xl font-bold transition text-sm">
+                                Send
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Data Models structured explicitly for ease of classification
+        const conditionDatabase = {
+            'common_cold': { name: 'Common Cold & Fever', icon: '🤧', med: 'Paracetamol (500mg) - Take 1 tablet after food if suffering from fever or body pain. Maximum 3 times a day.', diet: 'Drink warm water exclusively. Eat soft foods like Khichdi or Rice Porridge. Avoid cold milk, curd, and fruits like bananas.' },
+            'knee_surgery': { name: 'Post-Knee Surgery Recovery', icon: '🦿', med: 'Prescribed Painkiller & Calcium Supplements (Take exactly as directed by your surgeon). Do not miss morning doses.', diet: 'High protein to rebuild tissues (Dal, paneer, sprouts). Include Turmeric milk at night to lower muscle swelling. Avoid spicy food to prevent stomach acidity from pills.' },
+            'heart_surgery': { name: 'Post-Heart Surgery Recovery', icon: '🫀', med: 'Blood Thinners & Cardio Protective Drugs (As directed by hospital). Never skip or alter timing.', diet: 'Strict zero-added-salt diet to manage blood pressure. Eat boiled vegetables and oats. Avoid deep-fried items, ghee, butter, and red meat completely.' },
+            'stomach_infection': { name: 'Stomach Infection / Diarrhea', icon: '🤢', med: 'ORS (Oral Rehydration Salts) - Mix 1 packet in 1 Litre of clean water. Drink small sips continuously throughout the day.', diet: 'Strictly follow the BRAT plan: Bananas, Rice, Applesauce, Toast. Avoid oils, heavy masalas, and dairy products until fully recovered.' },
+            'high_bp': { name: 'High Blood Pressure (Hypertension)', icon: '🩺', med: 'Standard Daily Antihypertensive Pill (Take every single morning at exactly the same hour).', diet: 'Incorporate garlic and green leafy vegetables. Cut salt intake by half. Avoid pickles, papads, and processed snacks containing high sodium preservatives.' },
+            'diabetes': { name: 'Diabetes Management', icon: '🩸', med: 'Metformin or prescribed morning/night anti-diabetic pills (Take 15 minutes before your primary meal).', diet: 'High-fiber grains like ragi, jowar, or brown rice. Completely avoid white sugar, sweets, potatoes, juices, and refined flour (maida).' }
+        };
+
+        let currentPatient = null;
+        let selectedConditionKey = null;
+        let extraMedicines = [];
+
+        // Application Startup & Condition Layout Builder
+        window.onload = () => {
+            const grid = document.getElementById('conditionGrid');
+            grid.innerHTML = Object.keys(conditionDatabase).map(key => {
+                const c = conditionDatabase[key];
+                return `
+                    <button onclick="selectCondition('${key}')" id="btn-${key}" class="p-4 bg-white hover:bg-emerald-50/50 border border-slate-200 rounded-xl transition text-center flex flex-col items-center justify-center gap-2 group hover:border-emerald-400 shadow-sm">
+                        <span class="text-3xl group-hover:scale-110 transition duration-150">${c.icon}</span>
+                        <span class="text-xs font-semibold text-slate-700 leading-tight">${c.name}</span>
+                    </button>
+                `;
+            }).join('');
+        };
+
+        // Transition from profile to application dashboard
+        function saveProfile(event) {
+            event.preventDefault();
+            currentPatient = {
+                name: document.getElementById('pName').value,
+                doctorPhone: document.getElementById('docPhone').value
+            };
+
+            document.getElementById('profileSection').classList.add('hidden');
+            document.getElementById('dashboardHub').classList.remove('hidden');
+            
+            document.getElementById('displayPatientName').textContent = currentPatient.name;
+            document.getElementById('activePatientDisplay').classList.remove('hidden');
+            document.getElementById('emergencyCallBtn').href = `tel:${currentPatient.doctorPhone}`;
+
+            initializeElena();
+        }
+
+        // Logic for Handling Option Clicks
+        function selectCondition(key) {
+            // Clear prior styling states
+            if (selectedConditionKey) {
+                document.getElementById(`btn-${selectedConditionKey}`).classList.remove('border-emerald-500', 'bg-emerald-50/60', 'ring-2', 'ring-emerald-500/20');
+            }
+            
+            selectedConditionKey = key;
+            const data = conditionDatabase[key];
+            
+            // Apply high visibility border state to selection card
+            document.getElementById(`btn-${key}`).classList.add('border-emerald-500', 'bg-emerald-50/60', 'ring-2', 'ring-emerald-500/20');
+
+            // Set text outputs within the treatment visualization portal
+            document.getElementById('selectedCondName').textContent = data.name;
+            document.getElementById('selectedCondIcon').textContent = data.icon;
+            document.getElementById('automaticMedicineText').textContent = data.med;
+            document.getElementById('automaticDietText').textContent = data.diet;
+            document.getElementById('protocolDisplayCard').classList.remove('hidden');
+
+            // Trigger Elena to voice out dynamic condition confirmation and diet alerts
+            const phrase = `I have updated your profile for ${data.name}. For your diet, please remember: ${data.diet}`;
+            appendChatBubble('ai', phrase);
+            speak(phrase);
+        }
+
+        // Processing Doctor-specific unique additions
+        function addExtraMedicine(event) {
+            event.preventDefault();
+            const nameEl = document.getElementById('extraMedName');
+            const timeEl = document.getElementById('extraMedTime');
+
+            const item = { name: nameEl.value.trim(), time: timeEl.value };
+            extraMedicines.push(item);
+
+            nameEl.value = '';
+            renderExtraMedicines();
+
+            // Elena dynamically references the new item injection safely
+            const text = `Understood. I have recorded your extra doctor medicine, ${item.name}, to be tracked at ${item.time}.`;
+            appendChatBubble('ai', text);
+            speak(text);
+        }
+
+        function renderExtraMedicines() {
+            const container = document.getElementById('extraMedsContainer');
+            const list = document.getElementById('extraMedsList');
+
+            if (extraMedicines.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            list.innerHTML = extraMedicines.map((m, index) => `
+                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center justify-between text-xs">
+                    <div>
+                        <p class="font-bold text-slate-800">${m.name}</p>
+                        <p class="text-slate-400 font-medium mt-0.5">⏱️ ${m.time}</p>
+                    </div>
+                    <button onclick="removeExtraMed(${index})" class="text-rose-500 font-bold hover:bg-rose-50 p-1.5 rounded-lg transition">❌</button>
+                </div>
+            `).join('');
+        }
+
+        function removeExtraMed(index) {
+            extraMedicines.splice(index, 1);
+            renderExtraMedicines();
+        }
+
+        // --- VOCAL & TEXT EMOTIONAL ASSISTANCE HUB ---
+        function initializeElena() {
+            const greet = `Hello ${currentPatient.name}, I am your health helper Elena. Please pick your health issue on the screen so I can construct your safe medicines list and daily food rules. How can I help you feel better right now?`;
+            appendChatBubble('ai', greet);
+            speak(greet);
+        }
+
+        function handleChat(event) {
+            event.preventDefault();
+            const input = document.getElementById('chatInput');
+            const query = input.value.trim();
+            if (!query) return;
+
+            appendChatBubble('user', query);
+            input.value = '';
+
+            setTimeout(() => {
+                const response = processAIEngineReply(query);
+                appendChatBubble('ai', response);
+                speak(response);
+            }, 600);
+        }
+
+        function appendChatBubble(sender, text) {
+            const log = document.getElementById('chatLog');
+            const row = document.createElement('div');
+            row.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            const design = sender === 'user' 
+                ? 'bg-emerald-600 text-white rounded-br-none font-medium' 
+                : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none';
+
+            row.innerHTML = `<div class="max-w-[85%] px-4 py-2.5 rounded-xl shadow-sm text-sm leading-relaxed ${design}">${text}</div>`;
+            log.appendChild(row);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function processAIEngineReply(rawText) {
+            const text = rawText.toLowerCase();
+            
+            // Intent handling for dietary queries
+            if (text.includes('eat') || text.includes('food') || text.includes('diet')) {
+                if (selectedConditionKey) {
+                    return `Since you are dealing with ${conditionDatabase[selectedConditionKey].name}, your baseline requirement is: ${conditionDatabase[selectedConditionKey].diet}. Make sure to eat simple home-cooked meals warm, and drink clean water.`;
+                }
+                return "Eating fresh, light, and low-salt food is generally the safest approach. Please select your specific medical condition from the layout icons on your left, and I will instantly map your absolute restrictions and daily food menu.";
+            }
+
+            // Intent handling for emotional distress/pain
+            if (text.includes('scared') || text.includes('afraid') || text.includes('worry') || text.includes('anxious') || text.includes('hospital')) {
+                return "It is completely natural to feel worried when you are far away from big hospitals, but please don't lose heart. You are doing the right things for your health right here. Take things slow, follow the medicine rules on your screen, and remember I am here to assist you all the way.";
+            }
+            if (text.includes('pain') || text.includes('hurt') || text.includes('severe')) {
+                return "I understand managing pain is incredibly heavy and exhausting. Please ensure you take your safe medicines immediately after food. If the pain gets too high, use the bright red button at the top of your screen to call your doctor directly right now.";
+            }
+            if (text.includes('thank') || text.includes('ok') || text.includes('good')) {
+                return "You are welcome! Taking care of your health is your primary duty, and I am glad to assist. Are there any other symptoms or pain areas you would like to discuss with me?";
+            }
+
+            return "Thank you for letting me know. I have taken note of that. Please rest comfortably, strictly follow the timeline guidelines on your dashboard, and call your doctor if anything feels uneasy.";
+        }
+
+        // Web Speech Synthesizer Module configured for high-comfort parameters
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // kill overlapping speech tracks
+                const utterance = new SpeechSynthesisUtterance(text);
+                const voices = window.speechSynthesis.getVoices();
+                
+                // Prioritize smooth, high-fidelity female speech profiles
+                const optimalVoice = voices.find(v => 
+                    v.name.includes('Google UK English Female') || 
+                    v.name.includes('Samantha') || 
+                    v.name.includes('Zira') ||
+                    v.name.includes('female')
+                );
+                if (optimalVoice) utterance.voice = optimalVoice;
+                
+                utterance.rate = 0.92; // Deliberate, reassuring pace for easy comprehension
+                utterance.pitch = 1.02;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+</html>
